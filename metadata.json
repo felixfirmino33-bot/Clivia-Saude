@@ -1,0 +1,6 @@
+{
+  "name": "Clívia Saúde",
+  "description": "Marketplace de saúde para Angola — Encontre, compare e marque consultas e exames em clínicas na Huíla (Lubango).",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
