@@ -319,14 +319,32 @@ class CliviaDataStore {
       this.clinics = savedClinics ? JSON.parse(savedClinics) : INITIAL_CLINICS;
       this.slots = savedSlots ? JSON.parse(savedSlots) : generateInitialSlots(this.clinics);
       this.appointments = savedAppointments ? JSON.parse(savedAppointments) : [];
-      
-      // Default to logged out until a real user authenticates
-      this.currentUser = savedUser ? JSON.parse(savedUser) : null;
+
+      const demoIds = new Set(['usr-patient-demo', 'user-clinic-1', 'usr-superadmin']);
+      const demoEmails = new Set([
+        'paciente@cliviasaude.ao',
+        'clinica@cliviasaude.ao',
+        'admin@cliviasaude.ao'
+      ]);
+
+      const parsedUser = savedUser ? JSON.parse(savedUser) : null;
+      const isDemoUser = !!parsedUser && (
+        demoIds.has(parsedUser.id) ||
+        (typeof parsedUser.email === 'string' && demoEmails.has(parsedUser.email.toLowerCase()))
+      );
+
+      if (isDemoUser) {
+        localStorage.removeItem('clivia_current_user');
+        this.currentUser = null;
+      } else {
+        this.currentUser = parsedUser || null;
+      }
     } catch {
       this.clinics = INITIAL_CLINICS;
       this.slots = generateInitialSlots(this.clinics);
       this.appointments = [];
       this.currentUser = null;
+      localStorage.removeItem('clivia_current_user');
     }
   }
 

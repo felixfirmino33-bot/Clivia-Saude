@@ -32,6 +32,12 @@ export const PatientPortal: React.FC<PatientPortalProps> = ({ onRefresh, onExplo
 
   const handleSubmitReview = (e: React.FormEvent, app: Appointment) => {
     e.preventDefault();
+
+    if (!currentUser) {
+      setReviewError('Faça login para avaliar este atendimento.');
+      return;
+    }
+
     if (!comment.trim()) {
       setReviewError('Por favor escreva um breve comentário sobre o atendimento.');
       return;
@@ -40,8 +46,8 @@ export const PatientPortal: React.FC<PatientPortalProps> = ({ onRefresh, onExplo
     const res = dataStore.addReview({
       appointmentId: app.id,
       clinicId: app.clinic_id,
-      patientId: currentUser?.id || 'usr-patient-demo',
-      patientName: app.patient_name || currentUser?.full_name || 'Paciente',
+      patientId: currentUser.id,
+      patientName: app.patient_name || currentUser.full_name || 'Paciente',
       rating,
       comment: comment.trim()
     });

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { ClinicWithDetails, Appointment, DoctorSlot, Specialty } from '../../types';
 import { dataStore } from '../../lib/supabase/client';
 import { formatPriceAOA, generateWhatsAppDirectLink } from '../../lib/notifications/whatsapp';
+import { ClinicMap } from '../maps/ClinicMap';
 import { 
   Calendar, Users, Clock, CheckCircle, XCircle, MessageSquare, 
   Plus, AlertCircle, TrendingUp, Stethoscope, ChevronRight,
@@ -61,6 +62,10 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
   const [isSavingDetails, setIsSavingDetails] = useState(false);
   const [autoSetCover, setAutoSetCover] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
+  const [isDetectingLocation, setIsDetectingLocation] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
+  const [detectedLatitude, setDetectedLatitude] = useState<number | null>(activeClinic.location?.latitude ?? null);
+  const [detectedLongitude, setDetectedLongitude] = useState<number | null>(activeClinic.location?.longitude ?? null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Add Service State
@@ -95,6 +100,8 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
     setEditProvince(activeClinic.location?.province || 'Huíla');
     setEditMunicipality(activeClinic.location?.municipality || 'Lubango');
     setEditNeighborhood(activeClinic.location?.neighborhood || 'Centro da Cidade');
+    setDetectedLatitude(activeClinic.location?.latitude ?? null);
+    setDetectedLongitude(activeClinic.location?.longitude ?? null);
     setSelectedDoctorId(activeClinic.doctors[0]?.id || '');
     setAppointments(dataStore.getAppointmentsForClinic(activeClinic.id));
   }, [
@@ -106,7 +113,9 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
     activeClinic.location?.address, 
     activeClinic.location?.province,
     activeClinic.location?.municipality,
-    activeClinic.location?.neighborhood
+    activeClinic.location?.neighborhood,
+    activeClinic.location?.latitude,
+    activeClinic.location?.longitude
   ]);
 
   const showFeedback = (text: string, type: 'success' | 'error' = 'success') => {
@@ -148,6 +157,58 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
     }
   };
 
+  const handleAutoDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError('Este navegador não suporta geolocalização automática.');
+      return;
+    }
+
+    setIsDetectingLocation(true);
+    setLocationError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        setDetectedLatitude(latitude);
+        setDetectedLongitude(longitude);
+
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await res.json();
+
+          const addr = data?.address || {};
+          const formattedAddress = [
+            data?.display_name || '',
+            addr?.road || '',
+            addr?.house_number || ''
+          ].filter(Boolean).join(', ');
+
+          const municipality = addr?.city || addr?.town || addr?.village || editMunicipality || 'Lubango';
+          const province = addr?.state || editProvince || 'Huíla';
+          const neighborhood = addr?.suburb || addr?.neighbourhood || addr?.quarter || editNeighborhood || 'Centro da Cidade';
+
+          setEditAddress(formattedAddress || editAddress || 'Lubango, Província da Huíla');
+          setEditMunicipality(municipality);
+          setEditProvince(province);
+          setEditNeighborhood(neighborhood);
+          setLocationError(null);
+        } catch {
+          setLocationError('A localização foi obtida, mas não foi possível completar o endereço automaticamente.');
+        } finally {
+          setIsDetectingLocation(false);
+        }
+      },
+      () => {
+        setLocationError('Não foi possível obter a sua localização. Verifique as permissões do navegador e tente novamente.');
+        setIsDetectingLocation(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+    );
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSavingDetails(true);
@@ -160,7 +221,9 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
       address: editAddress,
       province: editProvince,
       municipality: editMunicipality,
-      neighborhood: editNeighborhood
+      neighborhood: editNeighborhood,
+      latitude: detectedLatitude ?? activeClinic.location?.latitude ?? -14.9185,
+      longitude: detectedLongitude ?? activeClinic.location?.longitude ?? 13.4942
     });
 
     setIsSavingDetails(false);
@@ -1174,12 +1237,30 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
 
               {/* Geographic Location (clinic_locations table) */}
               <div className="bg-slate-50/80 rounded-2xl p-4 border border-slate-200/80 space-y-4">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-teal-600" />
-                  <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    Localização e Morada Oficial (Tabela: clinic_locations)
-                  </span>
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-teal-600" />
+                    <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                      Localização e Morada Oficial (Tabela: clinic_locations)
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleAutoDetectLocation}
+                    disabled={isDetectingLocation}
+                    className="inline-flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-[11px] font-bold text-teal-800 hover:bg-teal-100 transition-colors cursor-pointer disabled:opacity-60"
+                  >
+                    <MapPin className="w-3.5 h-3.5" />
+                    <span>{isDetectingLocation ? 'A localizar...' : 'Usar a minha localização'}</span>
+                  </button>
                 </div>
+
+                {locationError && (
+                  <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] text-amber-800 font-medium">
+                    {locationError}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
@@ -1236,6 +1317,30 @@ export const ClinicPortal: React.FC<ClinicPortalProps> = ({
                     onChange={(e) => setEditAddress(e.target.value)}
                     placeholder="Ex: Rua Dr. António Agostinho Neto, junto ao Largo 1º de Maio, Lubango"
                     className="w-full p-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-teal-600 font-semibold"
+                  />
+                </div>
+
+                <div className="rounded-2xl border border-slate-200 bg-white p-2">
+                  <ClinicMap
+                    clinics={[
+                      {
+                        ...activeClinic,
+                        location: {
+                          ...activeClinic.location,
+                          latitude: detectedLatitude ?? activeClinic.location?.latitude ?? -14.9185,
+                          longitude: detectedLongitude ?? activeClinic.location?.longitude ?? 13.4942,
+                          address: editAddress || activeClinic.location?.address || 'Lubango, Huíla',
+                          province: editProvince || activeClinic.location?.province || 'Huíla',
+                          municipality: editMunicipality || activeClinic.location?.municipality || 'Lubango',
+                          neighborhood: editNeighborhood || activeClinic.location?.neighborhood || 'Centro da Cidade',
+                          id: activeClinic.location?.id || `loc-${activeClinic.id}`,
+                          clinic_id: activeClinic.id
+                        }
+                      }
+                    ]}
+                    selectedClinicId={activeClinic.id}
+                    onSelectClinic={() => undefined}
+                    className="h-[220px] w-full rounded-xl overflow-hidden border border-slate-200 shadow-inner"
                   />
                 </div>
               </div>
