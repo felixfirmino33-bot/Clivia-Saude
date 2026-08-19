@@ -19,7 +19,7 @@ export const supabase = supabaseUrl && supabaseAnonKey
   ? createClient(supabaseUrl, supabaseAnonKey) 
   : null;
 
-// Initial Initialized Seed Store for Luanda
+// Initial Initialized Seed Store for Lubango / Huíla
 const INITIAL_SPECIALTIES: Specialty[] = [
   { id: 'spec-1', name: 'Cardiologia' },
   { id: 'spec-2', name: 'Clínica Geral' },
@@ -381,7 +381,44 @@ class CliviaDataStore {
     localStorage.setItem('clivia_local_accounts', JSON.stringify(accounts));
   }
 
+  private normalizeEmail(email: string): string {
+    return email.trim().toLowerCase();
+  }
+
+  private isAuthBackendUnavailable(error?: string | null): boolean {
+    if (!error) return false;
+    const normalized = error.toLowerCase();
+    return normalized.includes('supabase') ||
+      normalized.includes('indisponível') ||
+      normalized.includes('demo') ||
+      normalized.includes('conectividade') ||
+      normalized.includes('network') ||
+      normalized.includes('fetch') ||
+      normalized.includes('failed to fetch');
+  }
+
+  private buildUserFromLocalAccount(account: { id: string; email: string; password: string; role: UserRole; full_name: string; phone?: string | null; created_at: string }): Profile & { email?: string } {
+    return {
+      id: account.id,
+      role: account.role,
+      email: account.email,
+      full_name: account.full_name,
+      phone: account.phone || null,
+      created_at: account.created_at
+    };
+  }
+
   async login(email: string, password: string): Promise<{ success: boolean; error?: string; user?: Profile & { email?: string } }> {
+    const emailNormalized = this.normalizeEmail(email);
+    const localAccounts = this.getLocalAccounts();
+    const localUser = localAccounts.find(account => account.email.toLowerCase() === emailNormalized && account.password === password);
+
+    if (localUser) {
+      const userObj = this.buildUserFromLocalAccount(localUser);
+      this.setCurrentUser(userObj);
+      return { success: true, user: userObj };
+    }
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -403,26 +440,13 @@ class CliviaDataStore {
         return { success: true, user: userObj };
       }
 
-      return { success: false, error: data.error || 'Credenciais inválidas.' };
-    } catch {
-      const emailNormalized = email.trim().toLowerCase();
-      const localAccounts = this.getLocalAccounts();
-      const localUser = localAccounts.find(account => account.email.toLowerCase() === emailNormalized && account.password === password);
-
-      if (localUser) {
-        const userObj: Profile & { email?: string } = {
-          id: localUser.id,
-          role: localUser.role,
-          email: localUser.email,
-          full_name: localUser.full_name,
-          phone: localUser.phone || null,
-          created_at: localUser.created_at
-        };
-        this.setCurrentUser(userObj);
-        return { success: true, user: userObj };
+      if (this.isAuthBackendUnavailable(data.error)) {
+        return { success: false, error: 'A autenticação real ainda não está activa. Configure o Supabase e tente novamente.' };
       }
 
-      return { success: false, error: 'E-mail ou palavra-passe incorretos.' };
+      return { success: false, error: data.error || 'Credenciais inválidas.' };
+    } catch {
+      return { success: false, error: 'Não foi possível iniciar sessão no momento. Verifique a ligação e tente novamente.' };
     }
   }
 
@@ -433,6 +457,14 @@ class CliviaDataStore {
     phone?: string;
     role: UserRole;
   }): Promise<{ success: boolean; error?: string; user?: Profile & { email?: string } }> {
+    const emailNormalized = this.normalizeEmail(payload.email);
+    const localAccounts = this.getLocalAccounts();
+    const existing = localAccounts.find(account => this.normalizeEmail(account.email) === emailNormalized);
+
+    if (existing) {
+      return { success: false, error: 'Este e-mail já está registado localmente. Faça login em vez de criar uma nova conta.' };
+    }
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
@@ -452,10 +484,50 @@ class CliviaDataStore {
         };
         this.setCurrentUser(userObj);
 
-        // If clinic_admin, ensure they have a clinic record created
         if (payload.role === 'clinic_admin') {
-          const existing = this.clinics.find(c => c.owner_id === userObj.id);
-          if (!existing) {
+          const existingClinic = this.clinics.find(c => c.owner_id === userObj.id);
+          if (!existingClinic) {
+            this.createClinic({
+              name: payload.full_name.trim() || 'Nova Clínica Lubango',
+              description: 'Clínica médica de excelência em Lubango, Huíla.',
+              phone: payload.phone || '+244 923 000 000',
+              whatsapp: payload.phone || '+244 923 000 000',
+              address: 'Lubango, Província da Huíla',
+              neighborhood: 'Centro da Cidade',
+              ownerId: userObj.id
+            });
+          }
+        }
+
+        return { success: true, user: userObj };
+      }
+
+      if (this.isAuthBackendUnavailable(data.error)) {
+        const newUser = {
+          id: `usr-local-${Date.now()}`,
+          email: emailNormalized,
+          password: payload.password,
+          role: payload.role,
+          full_name: payload.full_name.trim(),
+          phone: payload.phone || null,
+          created_at: new Date().toISOString()
+        };
+
+        this.saveLocalAccounts([...localAccounts, newUser]);
+
+        const userObj: Profile & { email?: string } = {
+          id: newUser.id,
+          role: newUser.role,
+          email: newUser.email,
+          full_name: newUser.full_name,
+          phone: newUser.phone || null,
+          created_at: newUser.created_at
+        };
+        this.setCurrentUser(userObj);
+
+        if (payload.role === 'clinic_admin') {
+          const existingClinic = this.clinics.find(c => c.owner_id === userObj.id);
+          if (!existingClinic) {
             this.createClinic({
               name: payload.full_name.trim() || 'Nova Clínica Lubango',
               description: 'Clínica médica de excelência em Lubango, Huíla.',
@@ -473,17 +545,9 @@ class CliviaDataStore {
 
       return { success: false, error: data.error || 'Erro ao criar conta.' };
     } catch {
-      const emailNormalized = payload.email.trim().toLowerCase();
-      const localAccounts = this.getLocalAccounts();
-      const existing = localAccounts.find(account => account.email.toLowerCase() === emailNormalized);
-
-      if (existing) {
-        return { success: false, error: 'Este e-mail já está registado localmente. Faça login em vez de criar uma nova conta.' };
-      }
-
       const newUser = {
         id: `usr-local-${Date.now()}`,
-        email: payload.email.trim().toLowerCase(),
+        email: emailNormalized,
         password: payload.password,
         role: payload.role,
         full_name: payload.full_name.trim(),

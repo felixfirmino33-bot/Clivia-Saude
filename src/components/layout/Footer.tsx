@@ -64,17 +64,43 @@ export const Footer: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:min-w-[520px]">
               <div className="partner-logo-card partner-logo-card--ag">
-                <div className="partner-card__mark partner-card__mark--ag" aria-hidden="true" />
+                <div className="partner-card__mark partner-card__mark--ag" aria-hidden="true">
+                  <svg viewBox="0 0 140 140" role="img" aria-label="AE Gadget logo">
+                    <path d="M18 84c20-38 52-56 90-52-14 0-32 4-48 18-14 12-24 28-31 42-4 8-8 12-11 14Z" fill="none" stroke="#fff7ed" strokeWidth="10" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M34 86c16-28 36-42 70-44" fill="none" stroke="#fff7ed" strokeWidth="8" strokeLinecap="round" opacity="0.92"/>
+                    <circle cx="92" cy="40" r="9" fill="#fff7ed"/>
+                    <path d="M108 48c-12 22-23 34-40 42" fill="none" stroke="#fff7ed" strokeWidth="7" strokeLinecap="round" opacity="0.9"/>
+                  </svg>
+                </div>
                 <span>AE GADGET</span>
                 <small>Soluções Tecnológicas</small>
               </div>
               <div className="partner-logo-card partner-logo-card--nar">
-                <div className="partner-card__mark partner-card__mark--nar" aria-hidden="true" />
+                <div className="partner-card__mark partner-card__mark--nar" aria-hidden="true">
+                  <svg viewBox="0 0 160 140" role="img" aria-label="Narosário logo">
+                    <path d="M22 82h70l16-22h32v22H22v-22Z" fill="#fff" opacity="0.12"/>
+                    <path d="M28 82h60l18-24h36v20H28v4Z" fill="#f8fafc" opacity="0.14"/>
+                    <path d="M50 52c16 0 30 10 34 26H65l-18 24H28l11-22c6-12 15-20 20-28Z" fill="#fbbf24" opacity="0.95"/>
+                    <path d="M76 42h20v14H76zm26 0h14v18H102zM22 90h90v10H22zm94 0h16v10h-16z" fill="#fff" opacity="0.92"/>
+                    <circle cx="104" cy="46" r="24" fill="none" stroke="#fff7ed" strokeWidth="8"/>
+                    <path d="M104 26v12M104 58v12M88 46h12M120 46h12M93 31l8 8M115 53l-8 8M115 31l-8 8M93 53l8-8" stroke="#fff7ed" strokeWidth="5" strokeLinecap="round"/>
+                    <circle cx="104" cy="46" r="5" fill="#fff7ed"/>
+                  </svg>
+                </div>
                 <span>NAROSÁRIO</span>
                 <small>ENTREGAS</small>
               </div>
               <div className="partner-logo-card partner-logo-card--integra">
-                <div className="partner-card__mark partner-card__mark--integra" aria-hidden="true" />
+                <div className="partner-card__mark partner-card__mark--integra" aria-hidden="true">
+                  <svg viewBox="0 0 140 140" role="img" aria-label="Integra logo">
+                    <rect x="14" y="14" width="42" height="42" rx="10" fill="rgba(255,255,255,0.12)" stroke="#fff" strokeWidth="7"/>
+                    <rect x="84" y="14" width="42" height="42" rx="10" fill="rgba(255,255,255,0.12)" stroke="#fff" strokeWidth="7"/>
+                    <rect x="14" y="84" width="42" height="42" rx="10" fill="rgba(255,255,255,0.12)" stroke="#fff" strokeWidth="7"/>
+                    <rect x="84" y="84" width="42" height="42" rx="10" fill="rgba(255,255,255,0.12)" stroke="#fff" strokeWidth="7"/>
+                    <path d="M70 20v100M20 70h100" stroke="#fff" strokeWidth="7" strokeLinecap="round"/>
+                    <circle cx="70" cy="70" r="13" fill="#fff"/>
+                  </svg>
+                </div>
                 <span>INTEGRA</span>
                 <small>Desenvolvimento</small>
               </div>

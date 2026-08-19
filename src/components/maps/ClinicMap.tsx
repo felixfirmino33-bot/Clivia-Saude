@@ -131,7 +131,7 @@ export const ClinicMap: React.FC<ClinicMapProps> = ({
       <div ref={mapContainerRef} className="h-full w-full" />
       <div className="absolute top-3 right-3 z-[1000] bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200 shadow-sm text-xs font-semibold text-slate-700 flex items-center gap-1.5 pointer-events-none">
         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        Luanda, Angola
+        Lubango, Huíla
       </div>
     </div>
   );

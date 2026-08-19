@@ -50,7 +50,7 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
         </div>
         <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs text-white drop-shadow-md">
           <span className="bg-black/60 backdrop-blur-md px-2 py-0.5 rounded-md font-semibold">
-            {clinic.location?.neighborhood || clinic.location?.municipality || 'Luanda'}
+            {clinic.location?.neighborhood || clinic.location?.municipality || 'Lubango'}
           </span>
         </div>
       </div>
@@ -69,7 +69,7 @@ export const ClinicCard: React.FC<ClinicCardProps> = ({
             </div>
             <div className="text-xs text-slate-500 font-medium flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-teal-600" />
-              <span>{clinic.location?.municipality}, Luanda</span>
+              <span>{clinic.location?.municipality || 'Lubango'}, Huíla</span>
             </div>
           </div>
 

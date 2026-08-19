@@ -68,7 +68,7 @@ export const ClinicDetailView: React.FC<ClinicDetailViewProps> = ({
           <div className="absolute top-4 left-4 flex gap-2">
             <span className="inline-flex items-center gap-1 bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
               <ShieldCheck className="w-4 h-4" />
-              Clínica Verificada em Luanda
+              Clínica Verificada em Lubango
             </span>
           </div>
 
@@ -86,7 +86,7 @@ export const ClinicDetailView: React.FC<ClinicDetailViewProps> = ({
               </h1>
               <p className="text-sm text-slate-200 flex items-center gap-1.5 mt-1.5">
                 <MapPin className="w-4 h-4 text-teal-400 shrink-0" />
-                {clinic.location?.address || `${clinic.location?.municipality}, Luanda`}
+                {clinic.location?.address || `${clinic.location?.municipality || 'Lubango'}, Huíla`}
               </p>
             </div>
 
@@ -116,7 +116,7 @@ export const ClinicDetailView: React.FC<ClinicDetailViewProps> = ({
           </div>
           <div className="p-4 text-center">
             <span className="text-xs text-slate-400 font-semibold uppercase block">Município</span>
-            <strong className="text-base font-extrabold text-slate-800">{clinic.location?.municipality || 'Luanda'}</strong>
+            <strong className="text-base font-extrabold text-slate-800">{clinic.location?.municipality || 'Lubango'}</strong>
           </div>
         </div>
 
@@ -246,7 +246,7 @@ export const ClinicDetailView: React.FC<ClinicDetailViewProps> = ({
           {activeTab === 'location' && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-bold text-slate-900">Localização em Luanda</h3>
+                <h3 className="text-lg font-bold text-slate-900">Localização em Lubango</h3>
                 <p className="text-xs text-slate-500 mt-0.5">{clinic.location?.address}</p>
               </div>
 
@@ -261,7 +261,7 @@ export const ClinicDetailView: React.FC<ClinicDetailViewProps> = ({
                 <div>
                   <span className="text-slate-400 font-semibold block">Endereço Completo:</span>
                   <strong className="text-slate-800 block text-sm mt-0.5">{clinic.location?.address}</strong>
-                  <span className="text-slate-500">{clinic.location?.neighborhood}, {clinic.location?.municipality}, Província de Luanda</span>
+                  <span className="text-slate-500">{clinic.location?.neighborhood || 'Centro'}, {clinic.location?.municipality || 'Lubango'}, Província da Huíla</span>
                 </div>
                 <div>
                   <span className="text-slate-400 font-semibold block">Contactos de Apoio:</span>

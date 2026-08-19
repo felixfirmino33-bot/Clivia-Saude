@@ -146,7 +146,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
             {step === 4 ? 'Marcação Confirmada!' : 'Agendar Consulta / Exame'}
           </h2>
           <p className="text-xs sm:text-sm text-teal-100/80 mt-1">
-            {clinic.location?.address || `${clinic.location?.municipality}, Luanda`}
+            {clinic.location?.address || `${clinic.location?.municipality || 'Lubango'}, Huíla`}
           </p>
 
           {/* Stepper (Steps 1 to 3) */}
@@ -503,7 +503,7 @@ export const BookingModal: React.FC<BookingModalProps> = ({
                     doctorName: confirmedAppointment.doctor?.full_name,
                     appointmentDate: slotDate.toLocaleDateString('pt-AO'),
                     appointmentTime: slotDate.toLocaleTimeString('pt-AO', { hour: '2-digit', minute: '2-digit' }),
-                    clinicAddress: clinic.location?.address || `${clinic.location?.municipality}, Luanda`,
+                    clinicAddress: clinic.location?.address || `${clinic.location?.municipality || 'Lubango'}, Huíla`,
                     priceAOA: selectedClinicService?.price || 0
                   }, confirmedAppointment.id);
 

@@ -114,7 +114,7 @@ export const PatientPortal: React.FC<PatientPortalProps> = ({ onRefresh, onExplo
                 doctorName: app.doctor?.full_name,
                 appointmentDate: starts.toLocaleDateString('pt-AO'),
                 appointmentTime: starts.toLocaleTimeString('pt-AO', { hour: '2-digit', minute: '2-digit' }),
-                clinicAddress: app.clinic?.location?.address || 'Luanda',
+                clinicAddress: app.clinic?.location?.address || 'Lubango, Huíla',
                 priceAOA: 20000
               }, app.id);
 
@@ -157,7 +157,7 @@ export const PatientPortal: React.FC<PatientPortalProps> = ({ onRefresh, onExplo
                     </div>
                     <div>
                       <span className="text-slate-400 block font-semibold">Local:</span>
-                      <span className="text-slate-700 line-clamp-1">{app.clinic?.location?.address || 'Luanda'}</span>
+                      <span className="text-slate-700 line-clamp-1">{app.clinic?.location?.address || 'Lubango, Huíla'}</span>
                     </div>
                   </div>
 
@@ -257,7 +257,7 @@ export const PatientPortal: React.FC<PatientPortalProps> = ({ onRefresh, onExplo
               onClick={onExploreClinics}
               className="mt-4 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer"
             >
-              Pesquisar Clínicas em Luanda
+              Pesquisar Clínicas em Lubango
             </button>
           </div>
         )}
