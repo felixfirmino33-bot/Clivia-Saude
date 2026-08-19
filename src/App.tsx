@@ -196,6 +196,58 @@ export default function App() {
               </div>
             </section>
 
+            <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-20">
+              <div className="rounded-3xl border border-slate-200 bg-white/95 p-6 sm:p-8 shadow-[0_18px_45px_rgba(15,23,42,0.08)] backdrop-blur-sm">
+                <div className="grid gap-8 lg:grid-cols-[1.3fr_0.7fr] lg:items-center">
+                  <div className="space-y-5">
+                    <span className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-teal-700">
+                      Plataforma de saúde em Angola
+                    </span>
+                    <div className="space-y-3">
+                      <h2 className="text-3xl sm:text-4xl font-black text-slate-900 leading-tight font-['Outfit',sans-serif]">
+                        A forma mais simples de encontrar a clínica certa.
+                      </h2>
+                      <p className="max-w-xl text-sm sm:text-base text-slate-600 leading-relaxed">
+                        Compare preços, veja disponibilidade em tempo real e marque consultas com confiança.
+                        Tudo em um só lugar, pensado para facilitar a vida de pacientes e clínicas da Huíla.
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleFilterChange({ selectedSpecialtyId: null, selectedServiceId: null })}
+                        className="rounded-xl bg-teal-700 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-teal-800"
+                      >
+                        Explorar clínicas
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenAuth('login', 'patient')}
+                        className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50"
+                      >
+                        Entrar na plataforma
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="partner-card partner-card--ag">
+                      <span className="partner-logo-text">AE GADGET</span>
+                      <small>Soluções Tecnológicas</small>
+                    </div>
+                    <div className="partner-card partner-card--integra">
+                      <span className="partner-logo-text">INTEGRA</span>
+                      <small>Sistema</small>
+                    </div>
+                    <div className="partner-card partner-card--nar">
+                      <span className="partner-logo-text">NAROSÁRIO</span>
+                      <small>ENTREGAS</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
             {/* Specialties Quick Carousel */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 relative z-20">
               <div className="bg-white rounded-2xl p-4 shadow-lg border border-slate-200/80 flex items-center gap-2 overflow-x-auto">

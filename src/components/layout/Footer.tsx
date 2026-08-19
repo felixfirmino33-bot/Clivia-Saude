@@ -56,6 +56,29 @@ export const Footer: React.FC = () => {
 
         </div>
 
+        <div className="mb-8 rounded-2xl border border-slate-800 bg-slate-950/40 px-4 py-5">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-slate-400">Empresas parceiras</p>
+              <p className="mt-1 text-sm text-slate-300">O sistema foi desenvolvido pela Integra e as outras duas são colaboradoras.</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:min-w-[520px]">
+              <div className="partner-logo-card partner-logo-card--ag">
+                <span>AE GADGET</span>
+                <small>Soluções Tecnológicas</small>
+              </div>
+              <div className="partner-logo-card partner-logo-card--nar">
+                <span>NAROSÁRIO</span>
+                <small>ENTREGAS</small>
+              </div>
+              <div className="partner-logo-card partner-logo-card--integra">
+                <span>INTEGRA</span>
+                <small>Desenvolvimento</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p>© {new Date().getFullYear()} Clívia Saúde. Todos os direitos reservados. Feito para Angola 🇦🇴</p>
           <div className="flex items-center gap-1">

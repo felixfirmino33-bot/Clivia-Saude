@@ -1,1 +1,153 @@
 @import "tailwindcss";
+
+:root {
+  --brand-teal: #0f766e;
+  --brand-dark: #0f172a;
+  --brand-slate: #f8fafc;
+  --brand-orange: #f97316;
+  --brand-blue: #1d4ed8;
+}
+
+body {
+  background: #f8fafc;
+}
+
+.partner-card {
+  display: flex;
+  min-height: 110px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(135deg, #ffffff, #eef7ff);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+  padding: 0.9rem 0.5rem;
+}
+
+.partner-card .partner-logo-text {
+  display: block;
+  font-size: clamp(0.7rem, 1vw, 1rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.partner-card small {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.partner-card--ag {
+  background: linear-gradient(135deg, #fff7ed, #ffffff);
+  color: #111827;
+}
+
+.partner-card--ag .partner-logo-text {
+  color: #111827;
+}
+
+.partner-card--ag .partner-logo-text::before {
+  content: "AE ";
+  color: #f59e0b;
+}
+
+.partner-card--integra {
+  background: linear-gradient(135deg, #eff6ff, #dbeafe);
+  color: #0f172a;
+}
+
+.partner-card--integra .partner-logo-text {
+  color: #0f172a;
+}
+
+.partner-card--nar {
+  background: linear-gradient(135deg, #fef2f2, #f8fafc);
+  color: #0f172a;
+}
+
+.partner-card--nar .partner-logo-text {
+  color: #0f172a;
+}
+
+.partner-card--nar .partner-logo-text::before {
+  content: "NE ";
+  color: #f97316;
+}
+
+.partner-logo-card {
+  display: flex;
+  min-height: 78px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.35);
+  text-align: center;
+  padding: 0.7rem 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+.partner-logo-card:hover {
+  transform: translateY(-1px);
+}
+
+.partner-logo-card span {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+}
+
+.partner-logo-card small {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.partner-logo-card--ag {
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(15,23,42,0.45));
+  color: #f8fafc;
+}
+
+.partner-logo-card--ag span {
+  color: #f8fafc;
+}
+
+.partner-logo-card--ag span::before {
+  content: "AE ";
+  color: #fbbf24;
+}
+
+.partner-logo-card--integra {
+  background: linear-gradient(135deg, rgba(59,130,246,0.22), rgba(15,23,42,0.5));
+  color: #f8fafc;
+}
+
+.partner-logo-card--integra span {
+  color: #f8fafc;
+}
+
+.partner-logo-card--nar {
+  background: linear-gradient(135deg, rgba(251,146,60,0.14), rgba(15,23,42,0.45));
+  color: #f8fafc;
+}
+
+.partner-logo-card--nar span {
+  color: #f8fafc;
+}
+
+.partner-logo-card--nar span::before {
+  content: "NE ";
+  color: #f97316;
+}
