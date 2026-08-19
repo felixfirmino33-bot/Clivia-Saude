@@ -232,14 +232,17 @@ export default function App() {
 
                   <div className="grid grid-cols-3 gap-3">
                     <div className="partner-card partner-card--ag">
+                      <div className="partner-card__mark partner-card__mark--ag" aria-hidden="true" />
                       <span className="partner-logo-text">AE GADGET</span>
                       <small>Soluções Tecnológicas</small>
                     </div>
                     <div className="partner-card partner-card--integra">
+                      <div className="partner-card__mark partner-card__mark--integra" aria-hidden="true" />
                       <span className="partner-logo-text">INTEGRA</span>
                       <small>Sistema</small>
                     </div>
                     <div className="partner-card partner-card--nar">
+                      <div className="partner-card__mark partner-card__mark--nar" aria-hidden="true" />
                       <span className="partner-logo-text">NAROSÁRIO</span>
                       <small>ENTREGAS</small>
                     </div>

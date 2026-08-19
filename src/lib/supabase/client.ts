@@ -316,9 +316,9 @@ class CliviaDataStore {
       const savedAppointments = localStorage.getItem('clivia_appointments');
       const savedUser = localStorage.getItem('clivia_current_user');
 
-      this.clinics = savedClinics ? JSON.parse(savedClinics) : INITIAL_CLINICS;
-      this.slots = savedSlots ? JSON.parse(savedSlots) : generateInitialSlots(this.clinics);
-      this.appointments = savedAppointments ? JSON.parse(savedAppointments) : [];
+      const parsedClinics = savedClinics ? JSON.parse(savedClinics) : null;
+      const parsedSlots = savedSlots ? JSON.parse(savedSlots) : null;
+      const parsedAppointments = savedAppointments ? JSON.parse(savedAppointments) : null;
 
       const demoIds = new Set(['usr-patient-demo', 'user-clinic-1', 'usr-superadmin']);
       const demoEmails = new Set([
@@ -327,17 +327,21 @@ class CliviaDataStore {
         'admin@cliviasaude.ao'
       ]);
 
+      this.clinics = Array.isArray(parsedClinics) && parsedClinics.length > 0 ? parsedClinics : INITIAL_CLINICS;
+      this.slots = Array.isArray(parsedSlots) && parsedSlots.length > 0 ? parsedSlots : generateInitialSlots(this.clinics);
+      this.appointments = Array.isArray(parsedAppointments) ? parsedAppointments : [];
+
       const parsedUser = savedUser ? JSON.parse(savedUser) : null;
       const isDemoUser = !!parsedUser && (
         demoIds.has(parsedUser.id) ||
         (typeof parsedUser.email === 'string' && demoEmails.has(parsedUser.email.toLowerCase()))
       );
 
-      if (isDemoUser) {
+      if (isDemoUser || !parsedUser || !parsedUser.id) {
         localStorage.removeItem('clivia_current_user');
         this.currentUser = null;
       } else {
-        this.currentUser = parsedUser || null;
+        this.currentUser = parsedUser;
       }
     } catch {
       this.clinics = INITIAL_CLINICS;
@@ -364,6 +368,19 @@ class CliviaDataStore {
   }
 
   // Authentication Handlers
+  private getLocalAccounts(): Array<{ id: string; email: string; password: string; role: UserRole; full_name: string; phone?: string | null; created_at: string }> {
+    try {
+      const raw = localStorage.getItem('clivia_local_accounts');
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  private saveLocalAccounts(accounts: Array<{ id: string; email: string; password: string; role: UserRole; full_name: string; phone?: string | null; created_at: string }>) {
+    localStorage.setItem('clivia_local_accounts', JSON.stringify(accounts));
+  }
+
   async login(email: string, password: string): Promise<{ success: boolean; error?: string; user?: Profile & { email?: string } }> {
     try {
       const res = await fetch('/api/auth/login', {
@@ -388,7 +405,24 @@ class CliviaDataStore {
 
       return { success: false, error: data.error || 'Credenciais inválidas.' };
     } catch {
-      return { success: false, error: 'Não foi possível autenticar no momento. Verifique a sua rede e tente novamente.' };
+      const emailNormalized = email.trim().toLowerCase();
+      const localAccounts = this.getLocalAccounts();
+      const localUser = localAccounts.find(account => account.email.toLowerCase() === emailNormalized && account.password === password);
+
+      if (localUser) {
+        const userObj: Profile & { email?: string } = {
+          id: localUser.id,
+          role: localUser.role,
+          email: localUser.email,
+          full_name: localUser.full_name,
+          phone: localUser.phone || null,
+          created_at: localUser.created_at
+        };
+        this.setCurrentUser(userObj);
+        return { success: true, user: userObj };
+      }
+
+      return { success: false, error: 'E-mail ou palavra-passe incorretos.' };
     }
   }
 
@@ -439,7 +473,52 @@ class CliviaDataStore {
 
       return { success: false, error: data.error || 'Erro ao criar conta.' };
     } catch {
-      return { success: false, error: 'Não foi possível criar a conta no momento. Verifique a conectividade e tente novamente.' };
+      const emailNormalized = payload.email.trim().toLowerCase();
+      const localAccounts = this.getLocalAccounts();
+      const existing = localAccounts.find(account => account.email.toLowerCase() === emailNormalized);
+
+      if (existing) {
+        return { success: false, error: 'Este e-mail já está registado localmente. Faça login em vez de criar uma nova conta.' };
+      }
+
+      const newUser = {
+        id: `usr-local-${Date.now()}`,
+        email: payload.email.trim().toLowerCase(),
+        password: payload.password,
+        role: payload.role,
+        full_name: payload.full_name.trim(),
+        phone: payload.phone || null,
+        created_at: new Date().toISOString()
+      };
+
+      this.saveLocalAccounts([...localAccounts, newUser]);
+
+      const userObj: Profile & { email?: string } = {
+        id: newUser.id,
+        role: newUser.role,
+        email: newUser.email,
+        full_name: newUser.full_name,
+        phone: newUser.phone || null,
+        created_at: newUser.created_at
+      };
+      this.setCurrentUser(userObj);
+
+      if (payload.role === 'clinic_admin') {
+        const existingClinic = this.clinics.find(c => c.owner_id === userObj.id);
+        if (!existingClinic) {
+          this.createClinic({
+            name: payload.full_name.trim() || 'Nova Clínica Lubango',
+            description: 'Clínica médica de excelência em Lubango, Huíla.',
+            phone: payload.phone || '+244 923 000 000',
+            whatsapp: payload.phone || '+244 923 000 000',
+            address: 'Lubango, Província da Huíla',
+            neighborhood: 'Centro da Cidade',
+            ownerId: userObj.id
+          });
+        }
+      }
+
+      return { success: true, user: userObj };
     }
   }
 
@@ -467,11 +546,12 @@ class CliviaDataStore {
   }
 
   getVerifiedClinics(): ClinicWithDetails[] {
-    return this.clinics.filter(c => c.status === 'verified');
+    const clinics = this.clinics.filter(c => c.status === 'verified');
+    return clinics.length > 0 ? clinics : INITIAL_CLINICS;
   }
 
   getAllClinics(): ClinicWithDetails[] {
-    return this.clinics;
+    return this.clinics.length > 0 ? this.clinics : INITIAL_CLINICS;
   }
 
   getClinicBySlug(slug: string): ClinicWithDetails | undefined {

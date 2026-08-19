@@ -64,14 +64,17 @@ export const Footer: React.FC = () => {
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 md:min-w-[520px]">
               <div className="partner-logo-card partner-logo-card--ag">
+                <div className="partner-card__mark partner-card__mark--ag" aria-hidden="true" />
                 <span>AE GADGET</span>
                 <small>Soluções Tecnológicas</small>
               </div>
               <div className="partner-logo-card partner-logo-card--nar">
+                <div className="partner-card__mark partner-card__mark--nar" aria-hidden="true" />
                 <span>NAROSÁRIO</span>
                 <small>ENTREGAS</small>
               </div>
               <div className="partner-logo-card partner-logo-card--integra">
+                <div className="partner-card__mark partner-card__mark--integra" aria-hidden="true" />
                 <span>INTEGRA</span>
                 <small>Desenvolvimento</small>
               </div>
