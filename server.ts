@@ -116,27 +116,7 @@ async function startServer() {
         return res.status(400).json({ success: false, error: 'Por favor preencha o e-mail e a palavra-passe.' });
       }
 
-      const demoEmails: Record<string, { role: 'patient' | 'clinic_admin' | 'admin', name: string, phone: string, id: string }> = {
-        'paciente@cliviasaude.ao': { id: 'usr-patient-demo', role: 'patient', name: 'Valter Fernandes (Paciente)', phone: '+244 923 456 789' },
-        'clinica@cliviasaude.ao': { id: 'user-clinic-1', role: 'clinic_admin', name: 'Administração Clínica Maianga', phone: '+244 923 120 001' },
-        'admin@cliviasaude.ao': { id: 'usr-superadmin', role: 'admin', name: 'Direção Clívia Saúde', phone: '+244 900 000 000' }
-      };
-
       if (!supabaseClient || !supabaseAdmin) {
-        const demo = demoEmails[email.toLowerCase().trim()];
-        if (demo) {
-          return res.json({
-            success: true,
-            user: {
-              id: demo.id,
-              email: email.toLowerCase().trim(),
-              role: demo.role,
-              full_name: demo.name,
-              phone: demo.phone
-            }
-          });
-        }
-
         return res.status(503).json({
           success: false,
           error: 'Autenticação indisponível: configure o Supabase para ativar o login real.'
@@ -150,27 +130,6 @@ async function startServer() {
       });
 
       if (signInError) {
-        // Check if demo email is used
-        const demoEmails: Record<string, { role: 'patient' | 'clinic_admin' | 'admin', name: string, phone: string, id: string }> = {
-          'paciente@cliviasaude.ao': { id: 'usr-patient-demo', role: 'patient', name: 'Valter Fernandes (Paciente)', phone: '+244 923 456 789' },
-          'clinica@cliviasaude.ao': { id: 'user-clinic-1', role: 'clinic_admin', name: 'Administração Clínica Maianga', phone: '+244 923 120 001' },
-          'admin@cliviasaude.ao': { id: 'usr-superadmin', role: 'admin', name: 'Direção Clívia Saúde', phone: '+244 900 000 000' }
-        };
-
-        const demo = demoEmails[email.toLowerCase().trim()];
-        if (demo) {
-          return res.json({
-            success: true,
-            user: {
-              id: demo.id,
-              email: email.toLowerCase().trim(),
-              role: demo.role,
-              full_name: demo.name,
-              phone: demo.phone
-            }
-          });
-        }
-
         return res.status(401).json({ success: false, error: 'Credenciais inválidas. Verifique o e-mail e a palavra-passe.' });
       }
 

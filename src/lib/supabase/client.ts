@@ -320,23 +320,13 @@ class CliviaDataStore {
       this.slots = savedSlots ? JSON.parse(savedSlots) : generateInitialSlots(this.clinics);
       this.appointments = savedAppointments ? JSON.parse(savedAppointments) : [];
       
-      // Default patient session
-      if (savedUser) {
-        this.currentUser = JSON.parse(savedUser);
-      } else {
-        this.currentUser = {
-          id: 'usr-patient-demo',
-          role: 'patient',
-          email: 'paciente@cliviasaude.ao',
-          full_name: 'Valter Fernandes (Paciente)',
-          phone: '+244 923 456 789',
-          created_at: new Date().toISOString()
-        };
-      }
+      // Default to logged out until a real user authenticates
+      this.currentUser = savedUser ? JSON.parse(savedUser) : null;
     } catch {
       this.clinics = INITIAL_CLINICS;
       this.slots = generateInitialSlots(this.clinics);
       this.appointments = [];
+      this.currentUser = null;
     }
   }
 
@@ -380,28 +370,7 @@ class CliviaDataStore {
 
       return { success: false, error: data.error || 'Credenciais inválidas.' };
     } catch {
-      // Offline / fallback auth
-      const roleMap: Record<string, { role: UserRole; name: string; phone: string }> = {
-        'paciente@cliviasaude.ao': { role: 'patient', name: 'Valter Fernandes (Paciente)', phone: '+244 923 456 789' },
-        'clinica@cliviasaude.ao': { role: 'clinic_admin', name: 'Administração Clínica Meditex Lubango', phone: '+244 923 120 001' },
-        'admin@cliviasaude.ao': { role: 'admin', name: 'Direção Clívia Saúde (Huíla)', phone: '+244 900 000 000' }
-      };
-
-      const found = roleMap[email.toLowerCase().trim()];
-      if (found) {
-        const fallbackUser: Profile & { email?: string } = {
-          id: `usr-${Date.now()}`,
-          role: found.role,
-          email: email.toLowerCase().trim(),
-          full_name: found.name,
-          phone: found.phone,
-          created_at: new Date().toISOString()
-        };
-        this.setCurrentUser(fallbackUser);
-        return { success: true, user: fallbackUser };
-      }
-
-      return { success: false, error: 'E-mail ou palavra-passe incorretos.' };
+      return { success: false, error: 'Não foi possível autenticar no momento. Verifique a sua rede e tente novamente.' };
     }
   }
 
@@ -452,71 +421,12 @@ class CliviaDataStore {
 
       return { success: false, error: data.error || 'Erro ao criar conta.' };
     } catch {
-      // Local fallback
-      const newUser: Profile & { email?: string } = {
-        id: `usr-${Date.now()}`,
-        role: payload.role,
-        email: payload.email,
-        full_name: payload.full_name,
-        phone: payload.phone || null,
-        created_at: new Date().toISOString()
-      };
-      this.setCurrentUser(newUser);
-
-      // If clinic_admin, create their personal clinic
-      if (payload.role === 'clinic_admin') {
-        const existing = this.clinics.find(c => c.owner_id === newUser.id);
-        if (!existing) {
-          this.createClinic({
-            name: payload.full_name.trim() || 'Nova Clínica Lubango',
-            description: 'Clínica médica de excelência em Lubango, Huíla.',
-            phone: payload.phone || '+244 923 000 000',
-            whatsapp: payload.phone || '+244 923 000 000',
-            address: 'Lubango, Província da Huíla',
-            neighborhood: 'Centro da Cidade',
-            ownerId: newUser.id
-          });
-        }
-      }
-
-      return { success: true, user: newUser };
+      return { success: false, error: 'Não foi possível criar a conta no momento. Verifique a conectividade e tente novamente.' };
     }
   }
 
   logout() {
     this.currentUser = null;
-    this.save();
-  }
-
-  switchRole(newRole: UserRole) {
-    if (newRole === 'patient') {
-      this.currentUser = {
-        id: 'usr-patient-demo',
-        role: 'patient',
-        email: 'paciente@cliviasaude.ao',
-        full_name: 'Valter Fernandes (Paciente)',
-        phone: '+244 923 456 789',
-        created_at: new Date().toISOString()
-      };
-    } else if (newRole === 'clinic_admin') {
-      this.currentUser = {
-        id: 'user-clinic-1',
-        role: 'clinic_admin',
-        email: 'clinica@cliviasaude.ao',
-        full_name: 'Dr. António Sebastião (Clínica Meditex Lubango)',
-        phone: '+244 923 120 001',
-        created_at: new Date().toISOString()
-      };
-    } else if (newRole === 'admin') {
-      this.currentUser = {
-        id: 'usr-superadmin',
-        role: 'admin',
-        email: 'admin@cliviasaude.ao',
-        full_name: 'Super Administrador (Clívia Saúde)',
-        phone: '+244 900 000 000',
-        created_at: new Date().toISOString()
-      };
-    }
     this.save();
   }
 

@@ -104,16 +104,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(false);
   };
 
-  // Quick Demo logins helper
-  const handleQuickDemo = (demoRole: UserRole) => {
-    dataStore.switchRole(demoRole);
-    setSuccessMessage(`Sessão iniciada como ${demoRole === 'patient' ? 'Paciente' : demoRole === 'clinic_admin' ? 'Clínica' : 'Administrador'}`);
-    setTimeout(() => {
-      onAuthSuccess();
-      onClose();
-    }, 400);
-  };
-
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm animate-fade-in overflow-y-auto"
@@ -342,36 +332,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               )}
             </button>
           </form>
-
-          {/* Quick Demo Access Switcher */}
-          <div className="pt-2 border-t border-slate-100">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2 text-center">
-              Acesso Rápido de Teste (Demo)
-            </span>
-            <div className="grid grid-cols-3 gap-1.5">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('patient')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer text-center truncate"
-              >
-                👤 Paciente
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('clinic_admin')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer text-center truncate"
-              >
-                🏥 Clínica
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo('admin')}
-                className="py-1.5 px-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer text-center truncate"
-              >
-                🛡️ Admin
-              </button>
-            </div>
-          </div>
 
           {/* Cancel Button */}
           <div className="pt-1 text-center">
